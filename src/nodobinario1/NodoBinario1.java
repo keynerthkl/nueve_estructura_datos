@@ -8,15 +8,17 @@ package nodobinario1;
  *
  * @author keyne
  */
-
 import java.util.ArrayList;
 import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.PriorityQueue;
 
 public class NodoBinario1 {
+
     int valor;
     int altura;
     NodoBinario1 izquierdo, derecho;
-   
 
     public NodoBinario1(int valor) {
         this.valor = valor;
@@ -89,7 +91,7 @@ public class NodoBinario1 {
         }
         System.out.print(this.valor + " ");
     }
-    
+
     // Método para buscar un nodo por su valor o clave
     public NodoBinario1 buscarPorClave(int clave) {
         if (clave == this.valor) {
@@ -101,7 +103,7 @@ public class NodoBinario1 {
         }
         return null;
     }
-    
+
     public List<NodoBinario1> buscarPorRango(int min, int max) {
         List<NodoBinario1> nodosEnRango = new ArrayList<>();
         buscarPorRangoRecursivo(this, min, max, nodosEnRango);
@@ -125,7 +127,7 @@ public class NodoBinario1 {
             buscarPorRangoRecursivo(nodo.derecho, min, max, nodosEnRango);
         }
     }
-    
+
     public List<NodoBinario1> buscarPorValor(int valorBuscado) {
         List<NodoBinario1> nodosEncontrados = new ArrayList<>();
         buscarPorValorRecursivo(this, valorBuscado, nodosEncontrados);
@@ -144,7 +146,7 @@ public class NodoBinario1 {
         buscarPorValorRecursivo(nodo.izquierdo, valorBuscado, nodosEncontrados);
         buscarPorValorRecursivo(nodo.derecho, valorBuscado, nodosEncontrados);
     }
-    
+
     // Método para insertar un nuevo nodo en un árbol binario AVL
     public NodoBinario1 insertarAVL(int valor) {
         NodoBinario1 nuevoNodo = new NodoBinario1(valor);
@@ -240,9 +242,69 @@ public class NodoBinario1 {
         return y;
     }
 
-    
+// Construir el árbol de Huffman
+    public NodoBinario1 construirArbolHuffman(Map<Character, Integer> frecuencias) {
+        PriorityQueue<NodoBinario1> colaPrioridad = new PriorityQueue<>();
+        // Crear un nodo para cada símbolo y agregarlo a la cola de prioridad
+        for (Map.Entry<Character, Integer> entrada : frecuencias.entrySet()) {
+            colaPrioridad.offer(new NodoBinario1(entrada.getKey(), entrada.getValue()));
+        }
+        // Combinar nodos hasta que quede un solo árbol
+        while (colaPrioridad.size() > 1) {
+            NodoBinario1 izquierdo = colaPrioridad.poll();
+            NodoBinario1 derecho = colaPrioridad.poll();
+            NodoBinario1 nuevoNodo = new NodoBinario1('\0', izquierdo.altura + derecho.altura);
+            nuevoNodo.izquierdo = izquierdo;
+            nuevoNodo.derecho = derecho;
+            colaPrioridad.offer(nuevoNodo);
+        }
+        // Devolver la raíz del árbol de Huffman
+        return colaPrioridad.poll();
+    }
 
+// Generar tabla de códigos basada en el árbol de Huffman
+    public Map<Character, String> generarTablaCodigos(NodoBinario1 raiz) {
+        Map<Character, String> tablaCodigos = new HashMap<>();
+        generarTablaCodigosRecursivo(raiz, "", tablaCodigos);
+        return tablaCodigos;
+    }
 
+    private void generarTablaCodigosRecursivo(NodoBinario1 nodo, String codigo, Map<Character, String> tablaCodigos) {
+        if (nodo == null) {
+            return;
+        }
+        if (nodo.valor != '\0') {
+            tablaCodigos.put(nodo.valor, codigo);
+        }
+        generarTablaCodigosRecursivo(nodo.izquierdo, codigo + "0", tablaCodigos);
+        generarTablaCodigosRecursivo(nodo.derecho, codigo + "1", tablaCodigos);
+    }
+
+// Comprimir los datos de entrada utilizando la tabla de códigos
+    public String comprimirDatos(String datos, Map<Character, String> tablaCodigos) {
+        StringBuilder comprimido = new StringBuilder();
+        for (char caracter : datos.toCharArray()) {
+            comprimido.append(tablaCodigos.get(caracter));
+        }
+        return comprimido.toString();
+    }
+
+// Descomprimir los datos comprimidos utilizando el árbol de Huffman
+    public String descomprimirDatos(String comprimido, NodoBinario1 raiz) {
+        StringBuilder descomprimido = new StringBuilder();
+        NodoBinario1 actual = raiz;
+        for (char bit : comprimido.toCharArray()) {
+            if (bit == '0') {
+                actual = actual.izquierdo;
+            } else {
+                actual = actual.derecho;
+            }
+            if (actual.valor != '\0') {
+                descomprimido.append(actual.valor);
+                actual = raiz;
+            }
+        }
+        return descomprimido.toString();
+    }
 
 }
-
