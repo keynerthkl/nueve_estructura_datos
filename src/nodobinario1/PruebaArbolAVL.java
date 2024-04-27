@@ -31,12 +31,10 @@ public class PruebaArbolAVL {
         } else {
             System.out.println("No se encontró ningún nodo con la clave " + claveBuscada);
         }
-
-        // Probar la eliminación
-        System.out.println("\nEliminación:");
-        raiz = raiz.eliminarAVL(20);
-        raiz = raiz.eliminarAVL(30);
-
+        
+        //Keinert 
+        //daniel
+        
         // Probar la búsqueda después de la eliminación
         System.out.println("\nBúsqueda después de la eliminación:");
         int valorBuscado = 40;
